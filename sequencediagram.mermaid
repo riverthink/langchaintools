@@ -1,0 +1,26 @@
+sequenceDiagram
+    actor User
+    participant Chainlit
+    participant Assistant LLM (gpt-4.1-mini)
+    participant Tool (generate_patient)
+    participant Summary LLM (gpt-4.1-mini)
+
+    User->>Chainlit: Send message (e.g., "Show me patient info")
+    Chainlit->>Assistant LLM (gpt-4.1-mini): Invoke with user message + assistant instruction (tools bound)
+    
+    alt Model produces text response
+        Assistant LLM (gpt-4.1-mini)->>Chainlit: Return text content
+        Chainlit->>User: Display "From Model: [text]"
+    else Model decides tool is needed
+        Assistant LLM (gpt-4.1-mini)->>Chainlit: Return tool_calls (decision to use tool)
+        Note over Chainlit: LLM determined a tool should be called
+        Chainlit->>Tool (generate_patient): Invoke tool
+        Tool (generate_patient)->>Chainlit: Return patient data
+        Note over Chainlit: {name, age, condition, ward}
+        Chainlit->>Summary LLM (gpt-4.1-mini): Create clinical note from tool output
+        Summary LLM (gpt-4.1-mini)->>Chainlit: Return formatted summary
+        Chainlit->>User: Display "From Tool: [data]<br/>Summary: [note]"
+    else No response
+        Assistant LLM (gpt-4.1-mini)->>Chainlit: Empty response
+        Chainlit->>User: Display "No response"
+    end

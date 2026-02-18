@@ -1,0 +1,15 @@
+flowchart LR
+    start[[Start]] --> A[Gather trip details: destination, days, style, constraints]
+    A --> B[Draft ideas: ask for three themes and rationales]
+    B --> C[Generate brainstorm - LLM creative]
+    C --> D[Clean the brainstorm text]
+    D --> E[Draft the outline: merge user details + brainstorm]
+    E --> F[Generate day-by-day outline - LLM steady]
+    F --> G[Clean the outline text]
+    G --> H[Prepare final request with the outline]
+    H --> I[Generate structured plan - LLM structured output]
+    I --> finish[[TravelPlan with overview, daily plan, reservations, packing]]
+    classDef big font-size:36px, stroke-width:2px;
+    classDef llm fill:#ffdddd,stroke:#cc0000,stroke-width:2px,color:#000000;
+    class start,A,B,C,D,E,F,G,H,I,finish big;
+    class C,F,I llm;

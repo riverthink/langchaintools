@@ -1,0 +1,23 @@
+flowchart TD
+    %% High-level RAG ingestion and retrieval via similarity search
+    subgraph Ingestion["Ingestion (once per document)"]
+        A([Start]) --> B[Load PDF]
+        B --> C[CHUNK DOCUMENT:
+        Keep within context windows which improve retrieval precision]
+        C --> D[CREATE EMBEDDINGS
+        text > semantic vectors]
+        D --> E[Store VECTORS + METADAT 
+        in vector database]
+        E --> F([Ready for queries])
+    end
+
+    subgraph Retrieval["Retrieval (per user query)"]
+        G([User question]) --> H[Embed query]
+        H --> I[SIMILARITY search against vector store]
+        I --> J[SELECT most RELEVANT chunks]
+        J --> K[INJECT chunks + question into LLM prompt]
+        K --> L[LLM generates grounded answer]
+        L --> M([Answer to user])
+    end
+
+    Ingestion -.-> G

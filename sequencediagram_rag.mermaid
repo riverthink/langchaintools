@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    participant User
+    participant UI as Chainlit UI
+    participant App as ragdemo.py
+    participant Loader as PyPDFLoader
+    participant Splitter as TextSplitter
+    participant Embed as OpenAIEmbeddings
+    participant VS as Chroma Vector Store
+    participant LLM as ChatOpenAI
+
+    Note over App: App startup
+    User->>UI: Open app
+    UI->>App: on_chat_start
+    App->>Loader: load(PDF_PATH)
+    Loader-->>App: documents
+    App->>Splitter: split_documents(documents)
+    Splitter-->>App: chunks
+    App->>Embed: embed_documents(chunks)
+    Embed-->>App: vectors
+    App->>VS: from_documents(chunks, vectors)
+    VS-->>App: vectorstore ready
+    App->>UI: Message "PDF loaded into Chroma..."
+
+    Note over App,VS: User query flow (always uses vectorstore)
+    User->>UI: Ask question
+    UI->>App: on_message(question)
+    App->>VS: similarity_search(question, k=4)
+    VS-->>App: top chunks
+    App->>App: build context prompt
+    App->>LLM: ainvoke(prompt)
+    LLM-->>App: answer
+    App-->>UI: send(answer)
